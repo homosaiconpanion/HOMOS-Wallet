@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تسجيل الدخول</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      direction: rtl;
+      text-align: center;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    input, button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 80%;
+      max-width: 300px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+  <!-- Firebase JS SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWyQfMmzp41jTYV4GXFViV2wMMTIiP8XU",
+      authDomain: "wallet-52a17.firebaseapp.com",
+      projectId: "wallet-52a17",
+      storageBucket: "wallet-52a17.appspot.com",
+      messagingSenderId: "440517088889",
+      appId: "1:440517088889:web:a862ab37106851c66066a8",
+      measurementId: "G-28Z0S2BGEV"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+</head>
+<body>
+  <div id="loginScreen">
+    <h2>تسجيل الدخول عبر رقم الهاتف</h2>
+    <input type="text" id="phoneNumber" placeholder="أدخل رقم الهاتف +20...">
+    <div id="recaptcha-container"></div>
+    <button onclick="sendOTP()">إرسال الرمز</button>
+    <div id="otpSection" class="hidden">
+      <input type="text" id="otp" placeholder="أدخل الرمز المرسل">
+      <button onclick="verifyOTP()">تأكيد الرمز</button>
+    </div>
+  </div>
+
+  <div id="mainScreen" class="hidden">
+    <h2>مرحباً بك</h2>
+    <p>رقمك: <span id="welcomePhone"></span></p>
+    <p>الرصيد: <span id="userBalance">0</span></p>
+    <div id="adminControl" class="hidden">
+      <p>لوحة تحكم المدير</p>
+    </div>
+  </div>
+
+  <script>
+    let confirmationResult;
+    window.onload = function () {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'normal',
+        'callback': function (response) {
+          console.log('reCAPTCHA passed');
+        }
+      });
+      recaptchaVerifier.render();
+    };
+
+    function sendOTP() {
+      const phoneNumber = document.getElementById("phoneNumber").value;
+      if (!phoneNumber.startsWith("+")) {
+        alert("يرجى كتابة الرقم مع كود الدولة (+20...)");
+        return;
+      }
+      firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+        .then(function (result) {
+          confirmationResult = result;
+          alert("تم إرسال الرمز إلى هاتفك.");
+          document.getElementById("otpSection").classList.remove("hidden");
+        })
+        .catch(function (error) {
+          alert("خطأ: " + error.message);
+        });
+    }
+
+    function verifyOTP() {
+      const code = document.getElementById("otp").value;
+      confirmationResult.confirm(code).then(function (result) {
+        const user = result.user;
+        alert("تم تسجيل الدخول: " + user.phoneNumber);
+        document.getElementById("welcomePhone").innerText = user.phoneNumber;
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("mainScreen").classList.remove("hidden");
+        localStorage.setItem('currentUser', user.phoneNumber);
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        if (!users[user.phoneNumber]) {
+          users[user.phoneNumber] = { password: "", balance: 0 };
+          localStorage.setItem('users', JSON.stringify(users));
+        }
+        document.getElementById("userBalance").innerText = users[user.phoneNumber].balance;
+        if (user.phoneNumber === "+2013579") {
+          document.getElementById("adminControl").classList.remove("hidden");
+        }
+      }).catch(function (error) {
+        alert("رمز خاطئ: " + error.message);
+      });
+    }
+  </script>
+</body>
+</html>
