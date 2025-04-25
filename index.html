@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HOMOS Wallet</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <h1>HOMOS Wallet</h1>
+    <button onclick="logout()">Logout</button>
+  </header>
+
+  <main>
+    <div id="auth-section">
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <p id="error-message"></p>
+    </div>
+
+    <div id="wallet-section" style="display: none;">
+      <h2>Welcome <span id="user-email"></span></h2>
+      <p>Your Balance: <span id="balance">0</span> EGP</p>
+
+      <div>
+        <h3>Deposit</h3>
+        <input type="number" id="deposit-amount" placeholder="Amount (min 5)" />
+        <button onclick="deposit()">Deposit</button>
+      </div>
+
+      <div>
+        <h3>Withdraw</h3>
+        <input type="number" id="withdraw-amount" placeholder="Amount (min 5)" />
+        <input type="text" id="withdraw-phone" placeholder="Phone Number" />
+        <button onclick="withdraw()">Withdraw</button>
+      </div>
+
+      <div>
+        <h3>Transfer</h3>
+        <input type="email" id="transfer-email" placeholder="Recipient Email" />
+        <input type="number" id="transfer-amount" placeholder="Amount" />
+        <button onclick="transfer()">Transfer</button>
+      </div>
+
+      <div id="admin-section" style="display: none;">
+        <h3>Admin Panel - Add Balance</h3>
+        <input type="email" id="target-email" placeholder="User Email" />
+        <input type="number" id="add-amount" placeholder="Amount" />
+        <button onclick="addBalance()">Add Balance</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
